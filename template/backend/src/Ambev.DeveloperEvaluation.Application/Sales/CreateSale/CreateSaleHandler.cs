@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Common.Events;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
@@ -11,38 +12,48 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
     /// Handles the <see cref="CreateSaleCommand"/> request to create a new sale.
     /// </summary>
     /// <remarks>
-    /// This handler validates the request using <see cref="CreateSaleCommandValidator"/>,
-    /// logs key actions, and creates a new sale with associated items in the repository.
+    /// This handler performs the following operations:
+    /// - Validates the incoming request using <see cref="CreateSaleCommandValidator"/>.
+    /// - Logs major processing steps and validation failures using <see cref="ILogger{CreateSaleHandler}"/>.
+    /// - Creates a new sale with associated sale items.
+    /// - Dispatches the <see cref="SaleCreatedEvent"/> upon successful creation.
     /// </remarks>
     public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleResult>
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<CreateSaleHandler> _logger;
+        private readonly IEventDispatcher _eventDispatcher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateSaleHandler"/> class.
         /// </summary>
-        /// <param name="saleRepository">The repository for sale operations.</param>
-        /// <param name="mapper">The AutoMapper instance for mapping domain objects.</param>
+        /// <param name="saleRepository">The repository for sale data operations.</param>
+        /// <param name="mapper">The AutoMapper instance for mapping data.</param>
         /// <param name="logger">The logger for tracking events.</param>
-        public CreateSaleHandler(ISaleRepository saleRepository, IMapper mapper, ILogger<CreateSaleHandler> logger)
+        /// <param name="eventDispatcher">The event dispatcher for publishing domain events.</param>
+        public CreateSaleHandler(
+            ISaleRepository saleRepository,
+            IMapper mapper,
+            ILogger<CreateSaleHandler> logger,
+            IEventDispatcher eventDispatcher)
         {
             _saleRepository = saleRepository;
             _mapper = mapper;
             _logger = logger;
+            _eventDispatcher = eventDispatcher;
         }
 
         /// <summary>
-        /// Handles the <see cref="CreateSaleCommand"/> request.
+        /// Processes the <see cref="CreateSaleCommand"/> request.
         /// </summary>
-        /// <param name="command">The create sale command containing sale details.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A <see cref="CreateSaleResult"/> containing the created sale details.</returns>
-        /// <exception cref="ValidationException">Thrown when the request validation fails.</exception>
+        /// <param name="command">The request containing sale creation details.</param>
+        /// <param name="cancellationToken">Cancellation token for async operations.</param>
+        /// <returns>A <see cref="CreateSaleResult"/> containing details of the newly created sale.</returns>
+        /// <exception cref="ValidationException">Thrown when the command validation fails.</exception>
         public async Task<CreateSaleResult> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Handling CreateSaleCommand for CustomerId: {CustomerId} at {Timestamp}",
+            _logger.LogInformation("Processing CreateSaleCommand for CustomerId: {CustomerId} at {Timestamp}",
                 command.CustomerId, DateTime.UtcNow);
 
             var validator = new CreateSaleCommandValidator();
@@ -69,6 +80,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
             var createdSale = await _saleRepository.CreateAsync(newSale, cancellationToken);
 
             _logger.LogInformation("Sale created successfully with ID: {SaleId}", createdSale.Id);
+
+            _eventDispatcher.Publish(new SaleCreatedEvent(newSale.Id));
 
             return _mapper.Map<CreateSaleResult>(createdSale);
         }

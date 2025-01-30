@@ -2,8 +2,20 @@
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale
 {
+    /// <summary>
+    /// Validator for <see cref="CreateSaleRequest"/> to ensure valid request parameters for creating a sale.
+    /// </summary>
     public class CreateSaleRequestValidator : AbstractValidator<CreateSaleRequest>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateSaleRequestValidator"/> with defined validation rules.
+        /// </summary>
+        /// <remarks>
+        /// Validation rules include:
+        /// - SaleDate: Must not be empty and cannot be in the future.
+        /// - Branch: Required and limited to 50 characters.
+        /// - CustomerId: Must be provided and not be an empty GUID.
+        /// </remarks>
         public CreateSaleRequestValidator()
         {
             RuleFor(x => x.SaleDate)

@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 {
+    /// <summary>
+    /// Controller for managing sales operations.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class SalesController : BaseController
@@ -20,12 +23,23 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SalesController"/> class.
+        /// </summary>
+        /// <param name="mediator">The mediator instance.</param>
+        /// <param name="mapper">The AutoMapper instance.</param>
         public SalesController(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Creates a new sale.
+        /// </summary>
+        /// <param name="request">The sale creation request.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The created sale details.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -48,6 +62,12 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             });
         }
 
+        /// <summary>
+        /// Retrieves a sale by its ID.
+        /// </summary>
+        /// <param name="id">The unique identifier of the sale.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The sale details if found.</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ApiResponseWithData<GetSaleResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -72,6 +92,12 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             });
         }
 
+        /// <summary>
+        /// Updates an existing sale.
+        /// </summary>
+        /// <param name="request">The sale update request.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The updated sale details.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ApiResponseWithData<UpdateSaleResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -94,6 +120,12 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             });
         }
 
+        /// <summary>
+        /// Deletes a sale by its ID.
+        /// </summary>
+        /// <param name="id">The unique identifier of the sale to delete.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Success response if the sale was deleted.</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
