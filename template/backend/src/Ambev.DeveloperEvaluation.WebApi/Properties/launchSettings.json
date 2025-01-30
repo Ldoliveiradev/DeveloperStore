@@ -48,6 +48,18 @@
       },
       "publishAllPorts": true,
       "useSSL": true
+    },
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "composeLaunchAction": "LaunchBrowser",
+      "composeLaunchServiceName": "web-api",
+      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
+      "composeProfile": {
+        "includes": [
+          "backend"
+        ]
+      }
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",

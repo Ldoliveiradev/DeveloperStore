@@ -35,16 +35,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
             var createdSale = await _saleRepository.CreateAsync(newSale, cancellationToken);
             var result = _mapper.Map<CreateSaleResult>(createdSale);
             return result;
-
-            //var existingSale = await _saleRepository.GetByIdAsync(command.CustomerId, cancellationToken);
-            //if (existingSale != null)
-            //    throw new InvalidOperationException($"User with email {command.CustomerId} already exists");
-
-            //var sale = _mapper.Map<Sale>(command);
-
-            //var createdUser = await _saleRepository.CreateAsync(sale, cancellationToken);
-            //var result = _mapper.Map<CreateSaleResult>(createdUser);
-            //return result;
         }
     }
 }
