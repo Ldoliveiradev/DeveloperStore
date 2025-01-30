@@ -12,7 +12,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public bool IsCancelled { get; private set; }
         public Guid SaleId { get; private set; }
 
-        public Sale Sale { get; private set; }
+        public Sale Sale { get; private set; } = default!;
 
         public SaleItem(Guid saleId, string productName, int quantity, decimal unitPrice, decimal discount)
         {

@@ -1,8 +1,8 @@
-﻿using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
+﻿using Ambev.DeveloperEvaluation.Application.Sales.GetUser;
 using Ambev.DeveloperEvaluation.Common.Validation;
 using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Application.Sales.GetUser
+namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
 {
     public class GetSaleCommand : IRequest<GetSaleResult>
     {

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Ambev.DeveloperEvaluation.Application.Sales.GetUser
+namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
 {
     public class GetSaleCommandValidator : AbstractValidator<GetSaleCommand>
     {

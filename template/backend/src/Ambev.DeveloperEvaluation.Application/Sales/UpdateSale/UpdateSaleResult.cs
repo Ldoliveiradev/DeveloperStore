@@ -8,10 +8,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         public int SaleNumber { get; set; }
         public DateTime SaleDate { get; set; }
         public decimal TotalAmount { get; set; }
-        public string Branch { get; set; }
+        public string Branch { get; set; } = string.Empty;
         public bool IsCancelled { get; set; }
         public Guid CustomerId { get; set; }
 
-        public IEnumerable<UpdateSaleItemResponse> Items { get; set; }
+        public List<UpdateSaleItemResponse> Items { get; set; } = [];
     }
 }

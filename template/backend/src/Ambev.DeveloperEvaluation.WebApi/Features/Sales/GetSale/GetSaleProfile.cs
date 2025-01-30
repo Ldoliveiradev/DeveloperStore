@@ -1,6 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Application.SaleItems.GetSaleItem;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
-using Ambev.DeveloperEvaluation.Application.Sales.GetUser;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.WebApi.Features.SaleItems.GetSaleItem;
 using AutoMapper;

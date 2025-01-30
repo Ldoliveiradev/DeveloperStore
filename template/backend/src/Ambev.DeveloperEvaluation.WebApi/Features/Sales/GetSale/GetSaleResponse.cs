@@ -8,10 +8,10 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale
         public int SaleNumber { get; set; }
         public DateTime SaleDate { get; set; }
         public decimal TotalAmount { get; set; }
-        public string Branch { get; set; }
+        public string Branch { get; set; } = string.Empty;
         public bool IsCancelled { get; set; }
         public Guid CustomerId { get; set; }
 
-        public IEnumerable<GetSaleItemResponse> SaleItems { get; set; }
+        public List<GetSaleItemResponse> SaleItems { get; set; } = [];
     }
 }

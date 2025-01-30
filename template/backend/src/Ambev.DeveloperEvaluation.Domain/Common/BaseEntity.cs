@@ -20,4 +20,14 @@ public class BaseEntity : IComparable<BaseEntity>
 
         return other!.Id.CompareTo(Id);
     }
+
+        public decimal CalculateDiscount(int quantity, decimal unitPrice)
+        {
+            if (quantity >= 10 && quantity <= 20)
+                return quantity * unitPrice * 0.20m;
+            if (quantity >= 4)
+                return quantity * unitPrice * 0.10m;
+
+            return 0;
+        }
 }

@@ -11,9 +11,9 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public bool IsCancelled { get; private set; }
         public Guid CustomerId { get; private set; }
 
-        public User Customer { get; private set; }
+        public User Customer { get; private set; } = new();
 
-        private readonly List<SaleItem> _saleItems = new();
+        private readonly List<SaleItem> _saleItems = [];
         public IReadOnlyCollection<SaleItem> SaleItems => _saleItems.AsReadOnly();
 
         public Sale(DateTime saleDate, string branch, Guid customerId)
@@ -78,16 +78,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
             }
 
             TotalAmount = 0;
-        }
-
-        public decimal CalculateDiscount(int quantity, decimal unitPrice)
-        {
-            if (quantity >= 10 && quantity <= 20)
-                return quantity * unitPrice * 0.20m;
-            if (quantity >= 4)
-                return quantity * unitPrice * 0.10m;
-
-            return 0;
         }
 
         private void RecalculateTotalAmount()

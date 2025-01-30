@@ -9,7 +9,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         public DateTime SaleDate { get; set; }
         public string Branch { get; set; }
         public Guid CustomerId { get; set; }
-        public List<CreateSaleItemCommand> Items { get; set; } = new();
+        public List<CreateSaleItemCommand> Items { get; set; } = [];
 
         public CreateSaleCommand(DateTime saleDate, string branch, Guid customerId, List<CreateSaleItemCommand> items)
         {

@@ -6,6 +6,6 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale
     {
         public Guid Id { get; set; }
         public bool IsCancelled { get; set; }
-        public IEnumerable<UpdateSaleItemRequest> Items { get; set; }
+        public List<UpdateSaleItemRequest> Items { get; set; } = [];
     }
 }
