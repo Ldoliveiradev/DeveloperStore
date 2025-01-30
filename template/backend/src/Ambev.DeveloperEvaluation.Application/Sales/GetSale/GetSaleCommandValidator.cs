@@ -2,9 +2,9 @@
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetUser
 {
-    public class GetSaleValidator : AbstractValidator<GetSaleCommand>
+    public class GetSaleCommandValidator : AbstractValidator<GetSaleCommand>
     {
-        public GetSaleValidator()
+        public GetSaleCommandValidator()
         {
             RuleFor(x => x.Id)
                 .NotEmpty()

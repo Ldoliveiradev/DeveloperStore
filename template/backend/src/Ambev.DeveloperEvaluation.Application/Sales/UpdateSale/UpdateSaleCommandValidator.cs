@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Ambev.DeveloperEvaluation.Application.SaleItems.UpdateSaleItem;
+using FluentValidation;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {
@@ -6,7 +7,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
     {
         public UpdateSaleCommandValidator()
         {
+            RuleFor(x => x.Id)
+               .NotEmpty().WithMessage("Sale ID is required.");
 
+            RuleForEach(x => x.Items)
+                .SetValidator(new UpdateSaleItemCommandValidator());
         }
     }
 }

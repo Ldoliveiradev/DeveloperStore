@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Ambev.DeveloperEvaluation.Common.Validation;
+using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.SaleItems.UpdateSaleItem
 {
@@ -17,6 +18,17 @@ namespace Ambev.DeveloperEvaluation.Application.SaleItems.UpdateSaleItem
             Quantity = quantity;
             UnitPrice = unitPrice;
             IsCancelled = isCancelled;
+        }
+
+        public ValidationResultDetail Validate()
+        {
+            var validator = new UpdateSaleItemCommandValidator();
+            var result = validator.Validate(this);
+            return new ValidationResultDetail
+            {
+                IsValid = result.IsValid,
+                Errors = result.Errors.Select(o => (ValidationErrorDetail)o)
+            };
         }
     }
 }

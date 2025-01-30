@@ -1,4 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Application.SaleItems.UpdateSaleItem;
+using Ambev.DeveloperEvaluation.Common.Validation;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
@@ -14,6 +15,17 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             Id = id;
             IsCancelled = isCancelled;
             Items = items;
+        }
+
+        public ValidationResultDetail Validate()
+        {
+            var validator = new UpdateSaleCommandValidator();
+            var result = validator.Validate(this);
+            return new ValidationResultDetail
+            {
+                IsValid = result.IsValid,
+                Errors = result.Errors.Select(o => (ValidationErrorDetail)o)
+            };
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Ambev.DeveloperEvaluation.Common.Validation;
+using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.SaleItems.CreateSaleItem
 {
@@ -13,6 +14,17 @@ namespace Ambev.DeveloperEvaluation.Application.SaleItems.CreateSaleItem
             ProductName = productName;
             Quantity = quantity;
             UnitPrice = unitPrice;
+        }
+
+        public ValidationResultDetail Validate()
+        {
+            var validator = new CreateSaleItemCommandValidator();
+            var result = validator.Validate(this);
+            return new ValidationResultDetail
+            {
+                IsValid = result.IsValid,
+                Errors = result.Errors.Select(o => (ValidationErrorDetail)o)
+            };
         }
     }
 }
