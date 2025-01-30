@@ -87,9 +87,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
             var discount = CalculateDiscount(quantity, unitPrice);
 
-            if (quantity < 4 && discount > 0)
-                throw new InvalidOperationException("Cannot apply discounts for less than 4 items.");
-
             var saleItem = new SaleItem(Id, productName, quantity, unitPrice, discount);
             _saleItems.Add(saleItem);
             RecalculateTotalAmount();

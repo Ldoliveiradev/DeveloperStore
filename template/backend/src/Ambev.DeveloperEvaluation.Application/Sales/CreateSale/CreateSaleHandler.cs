@@ -67,7 +67,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                 throw new ValidationException(validationResult.Errors);
             }
 
-            var newSale = new Sale(command.SaleDate, command.Branch, command.CustomerId);
+            var newSale = _mapper.Map<Sale>(command);
 
             foreach (var item in command.Items)
             {

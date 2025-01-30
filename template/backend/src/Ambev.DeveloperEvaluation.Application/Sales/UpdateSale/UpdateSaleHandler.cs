@@ -104,10 +104,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
                 existingSale.UpdateProduct(item.ProductName, item.Quantity, item.UnitPrice, item.IsCancelled);
             }
 
-            await _saleRepository.UpdateAsync(existingSale, cancellationToken);
+            var sale = await _saleRepository.UpdateAsync(existingSale, cancellationToken);
             _logger.LogInformation("Sale with ID {SaleId} updated successfully", command.Id);
 
-            return _mapper.Map<UpdateSaleResult>(existingSale);
+            return _mapper.Map<UpdateSaleResult>(sale);
         }
     }
 }
