@@ -60,6 +60,8 @@ public class User : BaseEntity, IUser
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
 
+    public ICollection<Sale> Sales { get; private set; }
+
     /// <summary>
     /// Gets the unique identifier of the user.
     /// </summary>
