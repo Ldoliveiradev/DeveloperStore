@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
-namespace Ambev.DeveloperEvaluation.Unit.Application.Sales
+namespace Ambev.DeveloperEvaluation.Unit.Application
 {
     /// <summary>
     /// Unit tests for <see cref="GetSaleHandler"/>.
@@ -74,17 +74,17 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.Sales
             _logger.Received(1).Log(
                 LogLevel.Information,
                 Arg.Any<EventId>(),
-                Arg.Is<object>(o => o.ToString().Contains("Handling GetSaleCommand for SaleId")),
+                Arg.Is<object>(o => o.ToString()!.Contains("Handling GetSaleCommand for SaleId")),
                 null,
-                Arg.Any<Func<object, Exception, string>>()
+                Arg.Any<Func<object, Exception?, string>>()
             );
 
             _logger.Received(1).Log(
                 LogLevel.Warning,
                 Arg.Any<EventId>(),
-                Arg.Is<object>(o => o.ToString().Contains("Validation failed for GetSaleCommand")),
+                Arg.Is<object>(o => o.ToString()!.Contains("Validation failed")),
                 null,
-                Arg.Any<Func<object, Exception, string>>()
+                Arg.Any<Func<object, Exception?, string>>()
             );
         }
 
@@ -110,7 +110,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.Sales
                 Arg.Any<EventId>(),
                 Arg.Any<object>(),
                 Arg.Any<Exception>(),
-                Arg.Any<Func<object, Exception, string>>()
+                Arg.Any<Func<object, Exception?, string>>()
             );
         }
 
@@ -123,7 +123,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.Sales
             // Given
             var command = GetSaleHandlerTestData.GenerateValidCommand();
 
-            _saleRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>()).Returns((Sale)null);
+            _saleRepository.GetByIdAsync(command.Id, Arg.Any<CancellationToken>()).Returns((Sale?)null);
 
             // When
             var act = () => _handler.Handle(command, CancellationToken.None);
@@ -134,9 +134,9 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.Sales
             _logger.Received(1).Log(
                 LogLevel.Error,
                 Arg.Any<EventId>(),
-                Arg.Is<object>(o => o.ToString().Contains($"Sale with ID {command.Id} not found")),
+                Arg.Is<object>(o => o.ToString()!.Contains($"Sale with ID {command.Id} not found")),
                 null,
-                Arg.Any<Func<object, Exception, string>>()
+                Arg.Any<Func<object, Exception?, string>>()
             );
         }
     }

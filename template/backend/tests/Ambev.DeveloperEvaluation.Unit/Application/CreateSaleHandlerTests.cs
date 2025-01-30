@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
-namespace Ambev.DeveloperEvaluation.Unit.Application.Sales
+namespace Ambev.DeveloperEvaluation.Unit.Application
 {
     /// <summary>
     /// Unit tests for <see cref="CreateSaleHandler"/>.
@@ -79,21 +79,20 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.Sales
             // Then
             await act.Should().ThrowAsync<ValidationException>();
 
-            // Assert BOTH log calls
             _logger.Received(1).Log(
                 LogLevel.Information,
                 Arg.Any<EventId>(),
-                Arg.Is<object>(o => o.ToString().Contains("Processing CreateSaleCommand for CustomerId")),
+                Arg.Is<object>(o => o.ToString()!.Contains("Processing CreateSaleCommand for CustomerId")),
                 null,
-                Arg.Any<Func<object, Exception, string>>()
+                Arg.Any<Func<object, Exception?, string>>()
             );
 
             _logger.Received(1).Log(
                 LogLevel.Warning,
                 Arg.Any<EventId>(),
-                Arg.Is<object>(o => o.ToString().Contains("Validation failed for CreateSaleCommand")),
+                Arg.Is<object>(o => o.ToString()!.Contains("Validation failed")),
                 null,
-                Arg.Any<Func<object, Exception, string>>()
+                Arg.Any<Func<object, Exception?, string>>()
             );
         }
 
@@ -122,7 +121,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.Sales
                 Arg.Any<EventId>(),
                 Arg.Any<object>(),
                 Arg.Any<Exception>(),
-                Arg.Any<Func<object, Exception, string>>()
+                Arg.Any<Func<object, Exception?, string>>()
             );
         }
 

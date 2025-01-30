@@ -8,24 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {
-    /// <summary>
-    /// Handles the <see cref="UpdateSaleCommand"/> request to update an existing sale.
-    /// </summary>
-    /// <remarks>
-    /// This handler validates and processes an update to a sale, including:
-    /// - Modifying sale items.
-    /// - Handling sale cancellations.
-    /// - Dispatching events for cancellations.
-    /// 
-    /// The <see cref="UpdateSaleCommandValidator"/> ensures that the provided data meets 
-    /// the necessary validation rules before processing.
-    /// 
-    /// The handler logs all major events, including validation failures, missing sales, updates, 
-    /// and cancellations using <see cref="ILogger{UpdateSaleHandler}"/>.
-    /// 
-    /// Additionally, it utilizes <see cref="IEventDispatcher"/> to publish events related to 
-    /// sale and item cancellations.
-    /// </remarks>
     public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleResult>
     {
         private readonly ISaleRepository _saleRepository;
@@ -33,14 +15,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         private readonly ILogger<UpdateSaleHandler> _logger;
         private readonly IEventDispatcher _eventDispatcher;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateSaleHandler"/> class.
-        /// </summary>
-        /// <param name="saleRepository">The repository for sale data operations.</param>
-        /// <param name="mapper">The AutoMapper instance for mapping data.</param>
-        /// <param name="logger">The logger for tracking events.</param>
-        /// <param name="eventDispatcher">The event dispatcher for publishing domain events.</param>
-        public UpdateSaleHandler(ISaleRepository saleRepository, IMapper mapper, ILogger<UpdateSaleHandler> logger, IEventDispatcher eventDispatcher)
+        public UpdateSaleHandler(
+            ISaleRepository saleRepository,
+            IMapper mapper,
+            ILogger<UpdateSaleHandler> logger,
+            IEventDispatcher eventDispatcher)
         {
             _saleRepository = saleRepository;
             _mapper = mapper;
@@ -48,44 +27,54 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             _eventDispatcher = eventDispatcher;
         }
 
-        /// <summary>
-        /// Processes the <see cref="UpdateSaleCommand"/> request.
-        /// </summary>
-        /// <param name="command">The update request containing sale modification details.</param>
-        /// <param name="cancellationToken">Cancellation token for async operations.</param>
-        /// <returns>The updated sale details.</returns>
-        /// <exception cref="ValidationException">Thrown when the command validation fails.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the sale does not exist.</exception>
         public async Task<UpdateSaleResult> Handle(UpdateSaleCommand command, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Processing UpdateSaleCommand for SaleId: {SaleId} at {Timestamp}",
-                command.Id, DateTime.UtcNow);
+            _logger.LogInformation("Processing UpdateSaleCommand for SaleId: {SaleId}", command.Id);
 
+            await ValidateCommandAsync(command, cancellationToken);
+
+            var existingSale = await GetExistingSaleAsync(command.Id, cancellationToken);
+
+            _logger.LogInformation("Updating Sale with ID {SaleId}", command.Id);
+
+            UpdateSaleEntity(existingSale, command);
+
+            var updatedSale = await _saleRepository.UpdateAsync(existingSale, cancellationToken);
+            _logger.LogInformation("Sale with ID {SaleId} updated successfully", command.Id);
+
+            return _mapper.Map<UpdateSaleResult>(updatedSale);
+        }
+
+        private async Task ValidateCommandAsync(UpdateSaleCommand command, CancellationToken cancellationToken)
+        {
             var validator = new UpdateSaleCommandValidator();
             var validationResult = await validator.ValidateAsync(command, cancellationToken);
 
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Validation failed for UpdateSaleCommand: {Errors}",
-                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-
+                var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+                _logger.LogWarning("Validation failed: {Errors}", errors);
                 throw new ValidationException(validationResult.Errors);
             }
+        }
 
-            var existingSale = await _saleRepository.GetByIdAsync(command.Id, cancellationToken);
-            if (existingSale == null)
+        private async Task<Domain.Entities.Sale> GetExistingSaleAsync(Guid saleId, CancellationToken cancellationToken)
+        {
+            var sale = await _saleRepository.GetByIdAsync(saleId, cancellationToken);
+            if (sale == null)
             {
-                _logger.LogError("Sale with ID {SaleId} not found", command.Id);
-                throw new InvalidOperationException($"Sale with id {command.Id} doesn't exist");
+                _logger.LogError("Sale with ID {SaleId} not found", saleId);
+                throw new InvalidOperationException($"Sale with id {saleId} doesn't exist");
             }
+            return sale;
+        }
 
-            _logger.LogInformation("Updating Sale with ID {SaleId}", command.Id);
-
+        private void UpdateSaleEntity(Domain.Entities.Sale existingSale, UpdateSaleCommand command)
+        {
             if (command.IsCancelled)
             {
                 _logger.LogInformation("Cancelling Sale ID {SaleId}", command.Id);
                 existingSale.Cancel();
-
                 _eventDispatcher.Publish(new SaleCancelledEvent(existingSale.Id));
             }
 
@@ -103,11 +92,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 
                 existingSale.UpdateProduct(item.ProductName, item.Quantity, item.UnitPrice, item.IsCancelled);
             }
-
-            var sale = await _saleRepository.UpdateAsync(existingSale, cancellationToken);
-            _logger.LogInformation("Sale with ID {SaleId} updated successfully", command.Id);
-
-            return _mapper.Map<UpdateSaleResult>(sale);
         }
     }
 }
