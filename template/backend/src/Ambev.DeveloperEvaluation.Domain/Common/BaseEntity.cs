@@ -21,7 +21,13 @@ public class BaseEntity : IComparable<BaseEntity>
         return other!.Id.CompareTo(Id);
     }
 
-        public decimal CalculateDiscount(int quantity, decimal unitPrice)
+    /// <summary>
+    /// Calculates a discount based on the quantity of items purchased.
+    /// </summary>
+    /// <param name="quantity">The number of items purchased.</param>
+    /// <param name="unitPrice">The price per unit of the product.</param>
+    /// <returns>The total discount amount.</returns>
+    protected static decimal CalculateDiscount(int quantity, decimal unitPrice)
         {
             if (quantity >= 10 && quantity <= 20)
                 return quantity * unitPrice * 0.20m;

@@ -2,8 +2,20 @@
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 {
+    /// <summary>
+    /// Validator for <see cref="CreateSaleCommand"/> that defines validation rules for creating a sale.
+    /// </summary>
     public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateSaleCommandValidator"/> with defined validation rules.
+        /// </summary>
+        /// <remarks>
+        /// Validation rules include:
+        /// - <c>SaleDate</c>: Must not be empty and cannot be set in the future.
+        /// - <c>Branch</c>: Must not be empty and must not exceed 50 characters.
+        /// - <c>CustomerId</c>: Must not be empty and must be a valid GUID.
+        /// </remarks>
         public CreateSaleCommandValidator()
         {
             RuleFor(x => x.SaleDate)
