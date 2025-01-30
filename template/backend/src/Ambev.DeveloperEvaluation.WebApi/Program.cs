@@ -10,22 +10,25 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-namespace Ambev.DeveloperEvaluation.WebApi;
-
-public class Program
+public partial class Program
 {
     public static void Main(string[] args)
+    {
+        var app = CreateWebApplication(args);
+        app.Run();
+    }
+
+    public static WebApplication CreateWebApplication(string[] args)
     {
         try
         {
             Log.Information("Starting web application");
 
-            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args);
             builder.AddDefaultLogging();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-
             builder.AddBasicHealthChecks();
             builder.Services.AddSwaggerGen();
 
@@ -37,11 +40,9 @@ public class Program
             );
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
-
             builder.RegisterDependencies();
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(ApplicationLayer).Assembly);
-
             builder.Services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssemblies(
@@ -57,7 +58,11 @@ public class Program
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<DefaultContext>();
-                dbContext.Database.Migrate();
+
+                if (dbContext.Database.IsRelational())
+                {
+                    dbContext.Database.Migrate();
+                }
             }
 
             app.UseMiddleware<ValidationExceptionMiddleware>();
@@ -69,19 +74,17 @@ public class Program
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseBasicHealthChecks();
-
             app.MapControllers();
 
-            app.Run();
+            return app;
         }
         catch (Exception ex)
         {
             Log.Fatal(ex, "Application terminated unexpectedly");
+            throw;
         }
         finally
         {

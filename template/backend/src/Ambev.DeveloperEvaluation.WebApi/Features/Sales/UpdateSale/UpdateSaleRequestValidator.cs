@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Ambev.DeveloperEvaluation.WebApi.Features.SaleItems.UpdateSaleItem;
+using FluentValidation;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale
 {
