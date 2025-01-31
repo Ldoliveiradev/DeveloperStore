@@ -1,5 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Application.SaleItems.UpdateSaleItem;
 using Ambev.DeveloperEvaluation.Common.Events;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
@@ -87,7 +88,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The existing sale entity.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the sale is not found.</exception>
-        private async Task<Domain.Entities.Sale> GetExistingSaleAsync(Guid saleId, CancellationToken cancellationToken)
+        private async Task<Sale> GetExistingSaleAsync(Guid saleId, CancellationToken cancellationToken)
         {
             var sale = await _saleRepository.GetByIdAsync(saleId, cancellationToken);
             if (sale == null)
@@ -103,7 +104,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         /// </summary>
         /// <param name="existingSale">The existing sale entity.</param>
         /// <param name="command">The UpdateSale command containing updated values.</param>
-        private void UpdateSaleEntity(Domain.Entities.Sale existingSale, UpdateSaleCommand command)
+        private void UpdateSaleEntity(Sale existingSale, UpdateSaleCommand command)
         {
             if (command.IsCancelled)
             {
