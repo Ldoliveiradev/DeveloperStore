@@ -30,15 +30,14 @@ namespace Ambev.DeveloperEvaluation.Integration
                 SaleDate = DateTime.UtcNow,
                 Branch = "Store 1",
                 CustomerId = Guid.NewGuid(),
-                Items = new List<CreateSaleItemRequest>
-                {
-                    new CreateSaleItemRequest
-                    {
+                Items =
+                [
+                    new() {
                         ProductName = "Laptop",
                         Quantity = 5,
                         UnitPrice = 20.00m
                     }
-                }
+                ]
             };
 
             // Act
@@ -57,15 +56,15 @@ namespace Ambev.DeveloperEvaluation.Integration
                 SaleDate = DateTime.UtcNow,
                 Branch = "Store 2",
                 CustomerId = Guid.NewGuid(),
-                Items = new List<CreateSaleItemRequest>
-                {
+                Items =
+                [
                     new CreateSaleItemRequest
                     {
                         ProductName = "Phone",
                         Quantity = 3,
                         UnitPrice = 50.00m
                     }
-                }
+                ]
             };
 
             // Act
@@ -73,7 +72,7 @@ namespace Ambev.DeveloperEvaluation.Integration
             postResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             var apiResponse = await postResponse.Content.ReadFromJsonAsync<ApiResponseWithData<CreateSaleResponse>>();
-            var saleId = apiResponse.Data.Id;
+            var saleId = apiResponse?.Data?.Id;
 
             saleId.Should().NotBeEmpty("O ID da venda não deve estar vazio");
 
@@ -84,24 +83,22 @@ namespace Ambev.DeveloperEvaluation.Integration
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            using (var jsonDoc = JsonDocument.Parse(content))
-            {
-                var saleData = jsonDoc.RootElement
-                    .GetProperty("data")
-                    .GetProperty("data");
+            using var jsonDoc = JsonDocument.Parse(content);
+            var saleData = jsonDoc.RootElement
+                .GetProperty("data")
+                .GetProperty("data");
 
-                var retrievedSaleId = saleData.GetProperty("id").GetString();
-                retrievedSaleId.Should().Be(saleId.ToString());
+            var retrievedSaleId = saleData.GetProperty("id").GetString();
+            retrievedSaleId.Should().Be(saleId.ToString());
 
-                saleData.GetProperty("branch").GetString().Should().Be("Store 2");
+            saleData.GetProperty("branch").GetString().Should().Be("Store 2");
 
-                saleData.GetProperty("saleItems").GetArrayLength().Should().BeGreaterThan(0);
+            saleData.GetProperty("saleItems").GetArrayLength().Should().BeGreaterThan(0);
 
-                var firstSaleItem = saleData.GetProperty("saleItems")[0];
-                firstSaleItem.GetProperty("productName").GetString().Should().Be("Phone");
-                firstSaleItem.GetProperty("quantity").GetInt32().Should().Be(3);
-                firstSaleItem.GetProperty("unitPrice").GetDecimal().Should().Be(50.00m);
-            }
+            var firstSaleItem = saleData.GetProperty("saleItems")[0];
+            firstSaleItem.GetProperty("productName").GetString().Should().Be("Phone");
+            firstSaleItem.GetProperty("quantity").GetInt32().Should().Be(3);
+            firstSaleItem.GetProperty("unitPrice").GetDecimal().Should().Be(50.00m);
         }
 
         [Fact]
@@ -113,15 +110,15 @@ namespace Ambev.DeveloperEvaluation.Integration
                 SaleDate = DateTime.UtcNow,
                 Branch = "Store 2",
                 CustomerId = Guid.NewGuid(),
-                Items = new List<CreateSaleItemRequest>
-                {
+                Items =
+                [
                     new CreateSaleItemRequest
                     {
                         ProductName = "Phone",
                         Quantity = 3,
                         UnitPrice = 50.00m
                     }
-                }
+                ]
             };
 
             // Act
@@ -129,7 +126,7 @@ namespace Ambev.DeveloperEvaluation.Integration
             postResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             var apiResponse = await postResponse.Content.ReadFromJsonAsync<ApiResponseWithData<CreateSaleResponse>>();
-            var saleId = apiResponse.Data.Id;
+            var saleId = apiResponse!.Data!.Id;
 
             saleId.Should().NotBeEmpty("O ID da venda não deve estar vazio");
 
@@ -137,8 +134,8 @@ namespace Ambev.DeveloperEvaluation.Integration
             {
                 Id = saleId,
                 IsCancelled = false,
-                Items = new List<UpdateSaleItemRequest>
-                {
+                Items =
+                [
                     new UpdateSaleItemRequest
                     {
                         Id = Guid.NewGuid(),
@@ -147,7 +144,7 @@ namespace Ambev.DeveloperEvaluation.Integration
                         UnitPrice = 60.00m,
                         IsCancelled = false
                     }
-                }
+                ]
             };
 
             var updateResponse = await _client.PutAsJsonAsync($"/api/sales/{saleId}", updateSaleRequest);
@@ -169,22 +166,22 @@ namespace Ambev.DeveloperEvaluation.Integration
                 SaleDate = DateTime.UtcNow,
                 Branch = "Store 5",
                 CustomerId = Guid.NewGuid(),
-                Items = new List<CreateSaleItemRequest>
-                {
+                Items =
+                [
                     new CreateSaleItemRequest
                     {
                         ProductName = "Headphones",
                         Quantity = 1,
                         UnitPrice = 200.00m
                     }
-                }
+                ]
             };
 
             var postResponse = await _client.PostAsJsonAsync("/api/sales", sale);
             postResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             var apiResponse = await postResponse.Content.ReadFromJsonAsync<ApiResponseWithData<CreateSaleResponse>>();
-            var saleId = apiResponse.Data.Id;
+            var saleId = apiResponse!.Data!.Id;
 
             // Act
             var deleteResponse = await _client.DeleteAsync($"/api/sales/{saleId}");
@@ -193,7 +190,7 @@ namespace Ambev.DeveloperEvaluation.Integration
             deleteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var deleteResponseContent = await deleteResponse.Content.ReadFromJsonAsync<ApiResponse>();
-            deleteResponseContent.Success.Should().BeTrue();
+            deleteResponseContent!.Success!.Should().BeTrue();
         }
     }
 }

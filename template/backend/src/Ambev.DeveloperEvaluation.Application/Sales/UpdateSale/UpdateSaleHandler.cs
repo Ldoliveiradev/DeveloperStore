@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {
+    /// <summary>
+    /// Handler for processing UpdateSaleCommand requests.
+    /// </summary>
     public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleResult>
     {
         private readonly ISaleRepository _saleRepository;
@@ -15,6 +18,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         private readonly ILogger<UpdateSaleHandler> _logger;
         private readonly IEventDispatcher _eventDispatcher;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateSaleHandler"/> class.
+        /// </summary>
+        /// <param name="saleRepository">The sale repository.</param>
+        /// <param name="mapper">The AutoMapper instance.</param>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="eventDispatcher">The event dispatcher for publishing events.</param>
         public UpdateSaleHandler(
             ISaleRepository saleRepository,
             IMapper mapper,
@@ -27,6 +37,12 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             _eventDispatcher = eventDispatcher;
         }
 
+        /// <summary>
+        /// Handles the UpdateSaleCommand request.
+        /// </summary>
+        /// <param name="command">The UpdateSale command.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The updated sale details.</returns>
         public async Task<UpdateSaleResult> Handle(UpdateSaleCommand command, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Processing UpdateSaleCommand for SaleId: {SaleId}", command.Id);
@@ -45,6 +61,12 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             return _mapper.Map<UpdateSaleResult>(updatedSale);
         }
 
+        /// <summary>
+        /// Validates the UpdateSaleCommand request.
+        /// </summary>
+        /// <param name="command">The UpdateSale command.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <exception cref="ValidationException">Thrown if validation fails.</exception>
         private async Task ValidateCommandAsync(UpdateSaleCommand command, CancellationToken cancellationToken)
         {
             var validator = new UpdateSaleCommandValidator();
@@ -58,17 +80,29 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             }
         }
 
+        /// <summary>
+        /// Retrieves an existing sale by ID.
+        /// </summary>
+        /// <param name="saleId">The ID of the sale to retrieve.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The existing sale entity.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the sale is not found.</exception>
         private async Task<Domain.Entities.Sale> GetExistingSaleAsync(Guid saleId, CancellationToken cancellationToken)
         {
             var sale = await _saleRepository.GetByIdAsync(saleId, cancellationToken);
             if (sale == null)
             {
                 _logger.LogError("Sale with ID {SaleId} not found", saleId);
-                throw new InvalidOperationException($"Sale with id {saleId} doesn't exist");
+                throw new InvalidOperationException($"Sale with ID {saleId} doesn't exist");
             }
             return sale;
         }
 
+        /// <summary>
+        /// Updates an existing sale entity with the provided command details.
+        /// </summary>
+        /// <param name="existingSale">The existing sale entity.</param>
+        /// <param name="command">The UpdateSale command containing updated values.</param>
         private void UpdateSaleEntity(Domain.Entities.Sale existingSale, UpdateSaleCommand command)
         {
             if (command.IsCancelled)
